@@ -1,0 +1,8 @@
+1x body_d.stl
+1x body_u.stl
+2x coxa_l.stl
+2x coxa_r.stl
+2x tibia_l.stl
+2x tibia_r.stl
+4x femur_1.stl
+8x s_hold.stl
