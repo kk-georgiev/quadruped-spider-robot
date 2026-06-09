@@ -2,10 +2,6 @@
 
 An autonomous 4-legged spider robot built with Arduino Nano, controlled by 12 servo motors and programmed with inverse kinematics for coordinated movement.
 
-## Demo
-
-> Add photos or video here
-
 ## Overview
 
 The robot uses a 3D-printed frame, an Arduino Nano, and a custom gait algorithm to achieve stable, balanced movement across flat and slightly uneven surfaces. Movement is autonomous — no remote control required.
