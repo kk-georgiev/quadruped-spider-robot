@@ -6,7 +6,6 @@ This folder contains the STL files for the 3D printed frame and leg components o
 
 The 3D models are sourced from **Robot LK** as part of their 3-in-1 Spider Robot (Quadruped) project.
 
-- **Original project:** [3-in-1 Spider Robot (Quadruped) using Arduino](https://robotlk.com/3-in-1-spider-robot-quadruped-using-arduino/)
 - **Downloads page:** [robotlk.com/downloads](https://robotlk.com/downloads/#3-in-1-spider-robot)
 - **Author:** Robot LK (robotlk.com)
 
