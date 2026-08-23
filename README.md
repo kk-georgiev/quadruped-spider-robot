@@ -83,7 +83,7 @@ sit();
 ## Build & Flash
 
 1. Install [Arduino IDE](https://www.arduino.cc/en/software)
-2. Add `FlexiTimer2` — place `flexitimer2-master/` in your Arduino libraries folder
+2. Install the [FlexiTimer2](https://github.com/wimleers/flexitimer2) library — download as ZIP and add via Arduino IDE: **Sketch → Include Library → Add .ZIP Library**
 3. Open `Basic_repetitive_movements_code.ino`
 4. Select **Arduino Nano** + correct COM port
 5. Upload
