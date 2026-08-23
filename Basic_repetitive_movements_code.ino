@@ -1,27 +1,27 @@
 /* Includes */
 #include <Servo.h>
-//Библиотека за управление на сервота
 #include <FlexiTimer2.h>
-//Библиотека за изпълнение на периодични задачи на определене интервал от време
+
 /* Servos */
 Servo servo[4][3];
-//Дефиниране на портовете за сервотата
+
+// Constants for positioning the robot's body
 const int servo_pin[4][3] = { {3, 4, 2}, {6, 7, 5}, {9, 8, 10},{12, 11, 13} };
+
 /* Size of the robot */
-//Размери на робота
 const float length_a = 55;
 const float length_b = 77.5;
 const float length_c = 27.5;
 const float length_side = 71;
 const float z_absolute = -28;
+
 /* Constants for movement */
-//Константи за позициониране на караката на робота
 const float z_default = -50, z_up = -30, z_boot = z_absolute;
 const float x_default = 62, x_offset = 0;
 const float y_start = 0, y_step = 40;
 const float y_default = x_default;
+
 /* Variables for movement */
-//Променливи за движението на робота
 volatile float site_now[4][3];
 volatile float site_expect[4][3];
 float temp_speed[4][3];
@@ -32,11 +32,12 @@ const float leg_move_speed = 8;
 const float body_move_speed = 3;
 const float stand_seat_speed = 1;
 volatile int rest_counter;
+
 /* Functions' parameter */
 const float KEEP = 255;
 const float pi = 3.1415926;
+
 /* Constants for turn */
-//Константи за въртене
 const float temp_a = sqrt(pow(2 * x_default + length_side, 2) + pow(y_step, 2));
 const float temp_b = 2 * (y_start + y_step) + length_side;
 const float temp_c = sqrt(pow(2 * x_default + length_side, 2) + pow(2 * y_start + y_step + length_side, 2));
@@ -45,15 +46,16 @@ const float turn_x1 = (temp_a - length_side) / 2;
 const float turn_y1 = y_start + y_step / 2;
 const float turn_x0 = turn_x1 - temp_b * cos(temp_alpha);
 const float turn_y0 = temp_b * sin(temp_alpha) - turn_y1 - length_side;
+
 /* setup function */
 void setup()
 {
-//  Инициализиране на позицията на краката на робота
+// Initialize the robot's leg positions
   set_site(0, x_default - x_offset, y_start + y_step, z_boot);
   set_site(1, x_default - x_offset, y_start + y_step, z_boot);
   set_site(2, x_default + x_offset, y_start, z_boot);
   set_site(3, x_default + x_offset, y_start, z_boot);
-//  Копиране на началните позиции
+// Copy the initial positions to the current positions
   for (int i = 0; i < 4; i++)
   {
     for (int j = 0; j < 3; j++)
@@ -61,14 +63,14 @@ void setup()
       site_now[i][j] = site_expect[i][j];
     }
   }
-//  Инициализаиране на таймер за упраление
+// Initialize the control timer
   FlexiTimer2::set(20, servo_service);
   FlexiTimer2::start();
-//  Прикачване на серотата
+// Attach the servos
   servo_attach();
 }
 
-//Функция за прикачване на сервотата
+// Function to attach the servos
 void servo_attach(void)
 {
   for (int i = 0; i < 4; i++)
@@ -81,7 +83,7 @@ void servo_attach(void)
   }
 }
 
-//Функция за разкачване на сервотата
+// Function to detach the servos
 void servo_detach(void)
 {
   for (int i = 0; i < 4; i++)
@@ -93,8 +95,9 @@ void servo_detach(void)
     }
   }
 }
+
 /* loop function */
-//Препрограмирани движения
+// Preprogrammed movements
 void loop()
 {
   step_forward(10);
@@ -113,7 +116,7 @@ void loop()
   delay(5000);
 }
 
-//Фунцкия за поставяне на робота в "седнало" положение
+// Function to put the robot into a "seated" position
 void sit(void)
 {
   move_speed = stand_seat_speed;
@@ -124,34 +127,26 @@ void sit(void)
   wait_all_reach();
 }
 
-//Функция за завъртане наляво. Завъртането се осъществява за предварително 
-//зададен брой стъпки
+// Function to turn left. The turn is performed for a predefined number of steps
 void turn_left(unsigned int step)
 {
-//  Задаване на скоростта на завъртане
   move_speed = spot_turn_speed;
   while (step-- > 0)
   {
-    //Проверка дали крак 3 в стартова позиция
     if (site_now[3][1] == y_start)
     {
-      //leg 3&1 move
-      //Повдигане на крак 3
       set_site(3, x_default + x_offset, y_start, z_up);
       wait_all_reach();
   
-      //Пренареждане на позициите
       set_site(0, turn_x1 - x_offset, turn_y1, z_default);
       set_site(1, turn_x0 - x_offset, turn_y0, z_default);
       set_site(2, turn_x1 + x_offset, turn_y1, z_default);
       set_site(3, turn_x0 + x_offset, turn_y0, z_up);
       wait_all_reach();
 
-      //Сваляне на крак 3
       set_site(3, turn_x0 + x_offset, turn_y0, z_default);
       wait_all_reach();
 
-      //Пренареждане на краката
       set_site(0, turn_x1 + x_offset, turn_y1, z_default);
       set_site(1, turn_x0 + x_offset, turn_y0, z_default);
       set_site(2, turn_x1 - x_offset, turn_y1, z_default);
@@ -172,7 +167,6 @@ void turn_left(unsigned int step)
     }
     else
     {
-      //leg 0&2 move
       set_site(0, x_default + x_offset, y_start, z_up);
       wait_all_reach();
 
@@ -206,8 +200,7 @@ void turn_left(unsigned int step)
   }
 }
 
-//Функция за завъртане надясно. Завъртането се осъществява за предварително 
-//зададен брой стъпки
+// Function to turn right. The turn is performed for a predefined number of steps
 void turn_right(unsigned int step)
 {
   move_speed = spot_turn_speed;
@@ -215,7 +208,6 @@ void turn_right(unsigned int step)
   {
     if (site_now[2][1] == y_start)
     {
-      //leg 2&0 move
       set_site(2, x_default + x_offset, y_start, z_up);
       wait_all_reach();
 
@@ -248,7 +240,6 @@ void turn_right(unsigned int step)
     }
     else
     {
-      //leg 1&3 move
       set_site(1, x_default + x_offset, y_start, z_up);
       wait_all_reach();
 
@@ -282,8 +273,7 @@ void turn_right(unsigned int step)
   }
 }
 
-//Функция за завъртане напред. Завъртането се осъществява за предварително 
-//зададен брой стъпки
+// Function to step forward. Performed for a predefined number of steps
 void step_forward(unsigned int step)
 {
   move_speed = leg_move_speed;
@@ -291,7 +281,6 @@ void step_forward(unsigned int step)
   {
     if (site_now[2][1] == y_start)
     {
-      //leg 2&1 move
       set_site(2, x_default + x_offset, y_start, z_up);
       wait_all_reach();
       set_site(2, x_default + x_offset, y_start + 2 * y_step, z_up);
@@ -318,7 +307,6 @@ void step_forward(unsigned int step)
     }
     else
     {
-      //leg 0&3 move
       set_site(0, x_default + x_offset, y_start, z_up);
       wait_all_reach();
       set_site(0, x_default + x_offset, y_start + 2 * y_step, z_up);
@@ -346,8 +334,8 @@ void step_forward(unsigned int step)
   }
 }
 
-//Функция за завъртане назад. Завъртането се осъществява за предварително 
-//зададен брой стъпки
+
+// Function to step backward. Performed for a predefined number of steps
 void step_back(unsigned int step)
 {
   move_speed = leg_move_speed;
@@ -355,7 +343,6 @@ void step_back(unsigned int step)
   {
     if (site_now[3][1] == y_start)
     {
-      //leg 3&0 move
       set_site(3, x_default + x_offset, y_start, z_up);
       wait_all_reach();
       set_site(3, x_default + x_offset, y_start + 2 * y_step, z_up);
@@ -382,7 +369,6 @@ void step_back(unsigned int step)
     }
     else
     {
-      //leg 1&2 move
       set_site(1, x_default + x_offset, y_start, z_up);
       wait_all_reach();
       set_site(1, x_default + x_offset, y_start + 2 * y_step, z_up);
@@ -410,7 +396,7 @@ void step_back(unsigned int step)
   }
 }
 
-//Функция за балансиране на робота наляво
+// Function to balance the robot to the left
 void body_left(int i)
 {
   set_site(0, site_now[0][0] + i, KEEP, KEEP);
@@ -420,7 +406,7 @@ void body_left(int i)
   wait_all_reach();
 }
 
-//Функция за балансиране на робота надясно
+// Function to balance the robot to the right
 void body_right(int i)
 {
   set_site(0, site_now[0][0] - i, KEEP, KEEP);
@@ -430,7 +416,7 @@ void body_right(int i)
   wait_all_reach();
 }
 
-//Функция за "махане с ръка"
+// Function for the "hand wave" gesture
 void hand_wave(int i)
 {
   float x_tmp;
@@ -477,7 +463,7 @@ void hand_wave(int i)
   }
 }
 
-//Функция за "ръкостистаке"
+// Function for the "handshake" gesture
 void hand_shake(int i)
 {
   float x_tmp;
@@ -524,8 +510,7 @@ void hand_shake(int i)
   }
 }
 
-//Функция за актуализиране на позицията на каракта на робота и
-//за управление на серотата 
+// Function to update the robot's leg positions and control the servos
 void servo_service(void)
 {
   sei();
@@ -548,9 +533,8 @@ void servo_service(void)
   rest_counter++;
 }
 
-//Функцията за задаване на желаната позиция на крак на робота. 
-//Тя изчислява разстоянието и посоката, в която кракът трябва да се премести, и 
-//генерира съответните стойности на скоростта
+// Function that sets the target position of a robot leg.
+// It calculates the distance and direction the leg needs to move, and generates the corresponding speed values
 void set_site(int leg, float x, float y, float z)
 {
   float length_x = 0, length_y = 0, length_z = 0;
@@ -576,7 +560,7 @@ void set_site(int leg, float x, float y, float z)
     site_expect[leg][2] = z;
 }
 
-//Фунцкия за изчакване на даден крак да достигне дадена позиция
+// Function to wait for a given leg to reach a given position
 void wait_reach(int leg)
 {
   while (1)
@@ -586,14 +570,14 @@ void wait_reach(int leg)
           break;
 }
 
-//Функция за проверка дали всички крака са достигнали дадените позиции
+// Function to check whether all legs have reached their given positions
 void wait_all_reach(void)
 {
   for (int i = 0; i < 4; i++)
     wait_reach(i);
 }
 
-//Фунцкия за смяна на координатната система
+// Function to convert between coordinate systems
 void cartesian_to_polar(volatile float &alpha, volatile float &beta, volatile float &gamma, volatile float x, volatile float y, volatile float z)
 {
   float v, w;
@@ -607,7 +591,7 @@ void cartesian_to_polar(volatile float &alpha, volatile float &beta, volatile fl
   gamma = gamma / pi * 180;
 }
 
-//Функция за превръщане на полярни ъгли в серийни ъгли за упралене на сервотата
+// Function to convert polar angles into servo angles for controlling the servos
 void polar_to_servo(int leg, float alpha, float beta, float gamma)
 {
   if (leg == 0)
