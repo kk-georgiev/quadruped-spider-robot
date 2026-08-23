@@ -17,9 +17,11 @@ The robot uses a 3D-printed frame, an Arduino Nano, and a custom gait algorithm 
 | 18650 Li-Ion Battery | 2 | ~30 min autonomy |
 | 3D Printed Parts | 22 | Frame and leg segments |
 
-**Total cost: ~85 BGN**
+**Total cost: ~44 EUR**
 
 ## Wiring
+
+![Wiring diagram](BlockScheme.png)
 
 Each leg uses 3 servos connected to the expansion shield:
 
